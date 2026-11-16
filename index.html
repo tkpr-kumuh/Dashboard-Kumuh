@@ -117,6 +117,9 @@ h2::before{display:none}
 .pick select{backdrop-filter:none}
 .modal{backdrop-filter:blur(4px)}
 .bl{background:color-mix(in srgb,var(--blue) 16%,transparent);color:var(--blue)}
+.hk .lbl{font-size:17px;font-weight:600}.hk .note{font-size:15.5px}.hk .big{font-size:64px;margin:8px 0 6px}.hk .mini{margin-top:26px;font-size:14.5px;gap:22px}.hk .mini b{font-size:21px;margin-bottom:2px}
+@media(max-width:700px){.hk .big{font-size:48px}.hk .lbl{font-size:15px}.hk .mini b{font-size:18px}}
+.tile{container-type:inline-size}.tile.m b{font-size:clamp(13px,9.5cqw,20px);white-space:nowrap;letter-spacing:-.03em}
 </style>
 </head>
 <body>
@@ -140,7 +143,7 @@ h2::before{display:none}
 </div>
 
 <h2 id="tren">Tren Mingguan</h2>
-<p class="sub">Perkembangan 7 minggu terakhir sejak awal Oktober 2026.</p>
+<p class="sub">Perkembangan mingguan sejak awal Oktober 2026, otomatis bertambah mengikuti data terbaru.</p>
 <div class="grid g2">
 <div class="card"><h3>Total realisasi (Rp miliar)</h3><p class="note">Akumulasi seluruh kawasan per minggu</p><div class="chart"><canvas id="cTot"></canvas></div></div>
 <div class="card"><h3>Rata-rata fisik &amp; keuangan</h3><p class="note">Rata-rata 16 kawasan, dalam persen</p><div class="chart"><canvas id="cAvg"></canvas></div></div>
@@ -210,12 +213,18 @@ function build(S){
  const M={};rows(S.mk,5,3).forEach(r=>M[tx(r[2])]=r);
  const H={};
  rows(S.ik,6,2).forEach(r=>{const d=dt(r[0]);if(!d)return;(H[tx(r[1])]=H[tx(r[1])]||[]).push({d,pic:tx(r[2]),st:tx(r[3]),c:[num(r[4]),num(r[5]),num(r[6]),num(r[7])],fp:num(r[8]),fl:num(r[10]),rn:num(r[11]),tp:tx(r[9]),tl:tx(r[13]),cat:tx(r[19])||tx(r[14]),kat:tx(r[15]),kd:tx(r[20])||tx(r[15]),tin:tx(r[21])||tx(r[16]),str:tx(r[22])||tx(r[17]),ket:tx(r[18])})});
- const g=(hr,r0,c0)=>{const o={};for(let c=c0;c<c0+16;c++){const nm=tx(S.dg[hr-1][c]);if(nm)o[nm]=[0,1,2,3,4,5,6].map(i=>num((S.dg[r0-1+i]||[])[c]))}return o};
+ const WL=[];for(let i=12;i<80;i++){const l=tx((S.dg[i]||[])[0]);if(!/^M\d+/.test(l))break;WL.push(l)}
+ const NW=WL.length,g=(hr,r0,c0)=>{const o={};for(let c=c0;c<c0+16;c++){const nm=tx(S.dg[hr-1][c]);if(nm)o[nm]=Array.from({length:NW},(_,i)=>num((S.dg[r0-1+i]||[])[c]))}return o};
  const GF=g(12,13,4),GK=g(48,49,4);
  const K=rows(S.dk,5,2).filter(r=>M[tx(r[1])]).map(r=>{const nm=tx(r[1]),m=M[nm],pagu=num(r[9]);
   const h=(H[nm]||[]).sort((a,b)=>a.d<b.d?-1:1);
   return{n:nm,s:tx(r[2]),pic:tx(r[3]),balai:tx(m[3]),prov:tx(r[5]),kab:tx(m[5]),kec:tx(m[6]),upd:dt(r[6]),hk:parseInt(r[7])||0,sts:tx(r[8]),pagu,real:num(r[10]),keu:pagu?num(r[10])/pagu:0,pp:num(r[12]),fis:num(r[13]),ren:num(r[14]),dev:num(r[15]),tp:tx(r[16]),tl:tx(r[17]),ncat:tx(r[18]),cat:tx(r[19]),kat:tx(r[20]),kd:tx(r[21]),tkat:tx(r[22]),tin:tx(r[23]),skat:tx(r[24]),str:tx(r[25]),ket:tx(r[26]),
-  comp:[8,9,10,11].map(i=>num(m[i])),rc:[27,28,29,30].map(i=>num(r[i])),ks:dt(m[14]),ke:dt(m[15]),sisa:tx(m[17]),fh:GF[nm]||GF[tx(r[2])]||[0,0,0,0,0,0,0],kh:GK[tx(r[2])]||GK[nm]||[0,0,0,0,0,0,0],h}});
+  comp:[8,9,10,11].map(i=>num(m[i])),rc:[27,28,29,30].map(i=>num(r[i])),ks:dt(m[14]),ke:dt(m[15]),sisa:tx(m[17]),fh:[...(GF[nm]||GF[tx(r[2])]||Array(NW).fill(0))],kh:[...(GK[tx(r[2])]||GK[nm]||Array(NW).fill(0))],h}});
+ const MB=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],iso=d=>d.toISOString().slice(0,10),now0=new Date();
+ const lastD=[...K.flatMap(k=>k.h.map(x=>x.d)),iso(new Date(Date.UTC(now0.getFullYear(),now0.getMonth(),now0.getDate())))].sort().pop();
+ let we=new Date(Date.UTC(2026,9,1+7*WL.length));
+ for(let n=0;n<80&&iso(new Date(we-6*864e5))<=lastD;n++){const e=iso(we);WL.push('M'+(WL.length+1)+' · '+p2(we.getUTCDate())+' '+MB[we.getUTCMonth()]);
+  K.forEach(k=>{const p=k.h.filter(x=>x.d<=e).pop();k.fh.push(p?p.fl:(k.fh[k.fh.length-1]||0));k.kh.push(p&&k.pagu?p.c.reduce((a,b)=>a+b,0)/k.pagu:(k.kh[k.kh.length-1]||0))});we=new Date(+we+7*864e5)}
  const cum=(list,ds)=>ds.map(d=>{let t=0;list.forEach(o=>{const p=o.h.filter(x=>x.d<=d);if(p.length)t+=o.f(p[p.length-1])});return[d,+(t/1e9).toFixed(3)]});
  const td=[...new Set(K.flatMap(k=>k.h.map(x=>x.d)))].sort();
  const trk=cum(K.map(k=>({h:k.h,f:x=>x.c.reduce((a,b)=>a+b,0)})),td);
@@ -223,7 +232,7 @@ function build(S){
  const bl=rows(S.db,5,2).map(r=>({n:tx(r[1]),s:tx(r[2]),pic:tx(r[3]),kaw:tx(r[4]),upd:dt(r[5]),hk:parseInt(r[6])||0,sts:tx(r[7]),pagu:num(r[8]),real:num(r[9]),ser:num(r[8])?num(r[9])/num(r[8]):0,sisa:num(r[11]),naik:num(r[12]),cat:tx(r[13]),kd:tx(r[14]),tin:tx(r[15]),str:tx(r[16]),sin:tx(r[17]),h:(BH[tx(r[1])]||[]).sort((a,b)=>a.d<b.d?-1:1)}));
  const bd=[...new Set(bl.flatMap(b=>b.h.map(x=>x.d)))].sort().slice(-12);
  const now=new Date();
- return{D:{weeks:FALLBACK.D.weeks,k:K,date:now.getFullYear()+'-'+p2(now.getMonth()+1)+'-'+p2(now.getDate()),tr:trk},B:{b:bl,tr:cum(bl.map(b=>({h:b.h,f:x=>x.r})),bd)}};
+ return{D:{weeks:WL.length?WL:FALLBACK.D.weeks,k:K,date:now.getFullYear()+'-'+p2(now.getMonth()+1)+'-'+p2(now.getDate()),tr:trk},B:{b:bl,tr:cum(bl.map(b=>({h:b.h,f:x=>x.r})),bd)}};
 }
 function badge(t,bad){let b=document.getElementById('lv');if(!b){b=document.createElement('button');b.id='lv';b.style.cssText='position:fixed;right:14px;bottom:14px;z-index:99;border:0;border-radius:99px;padding:9px 14px;font:600 12px inherit;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,.18);cursor:pointer;color:#fff';b.onclick=()=>location.reload();document.body.appendChild(b)}b.style.background=bad?'#d97706':'#16a34a';b.textContent=t}
 (async()=>{
@@ -264,8 +273,8 @@ const wf=W.map((_,w)=>avg(K.map(k=>k.fh[w]))),wk=W.map((_,w)=>sum(K.map(k=>k.kh[
 const dA=af-avg(K.map(k=>k.ren));
 const sm=(c,i,l,v,n)=>`<div class="card"><div class="chip ${c}">${i}</div><div class="lbl">${l}</div><div class="big" style="font-size:30px">${v}</div><div class="note" style="margin-top:6px">${n}</div></div>`;
 $('#kpi').innerHTML=`<div class="g2k">
-<div class="hk f"><div class="top"><div><div class="lbl">Realisasi fisik rata-rata</div><div class="big">${P(af)}</div><div class="note">Rencana ${P(avg(K.map(k=>k.ren)))} · ${dA>=0?'+':''}${(dA*100).toFixed(1).replace('.',',')} pp</div></div>${ring(af)}</div>${spark(wf)}<div class="mini"><div><b>${pos}</b>di atas / sesuai rencana</div><div><b>${neg}</b>tertinggal</div><div><b>${K.length}</b>kawasan</div></div></div>
-<div class="hk a"><div class="top"><div><div class="lbl">Realisasi anggaran</div><div class="big">${P(real/tot)}</div><div class="note">${M(real)} dari ${M(tot)}</div></div>${ring(real/tot)}</div>${spark(wk)}<div class="mini"><div><b>${M(real)}</b>terealisasi</div><div><b>${M(tot-real)}</b>sisa pagu</div></div></div></div>
+<div class="hk f"><div class="top"><div><div class="lbl">Realisasi fisik rata-rata</div><div class="big">${P(af)}</div><div class="note">Rencana ${P(avg(K.map(k=>k.ren)))} · ${dA>=0?'+':''}${(dA*100).toFixed(1).replace('.',',')} pp</div></div>${ring(af)}</div><div class="mini"><div><b>${pos}</b>di atas / sesuai rencana</div><div><b>${neg}</b>tertinggal</div><div><b>${K.length}</b>kawasan</div></div></div>
+<div class="hk a"><div class="top"><div><div class="lbl">Realisasi anggaran</div><div class="big">${P(real/tot)}</div><div class="note">${M(real)} dari ${M(tot)}</div></div>${ring(real/tot)}</div><div class="mini"><div><b>${M(real)}</b>terealisasi</div><div><b>${M(tot-real)}</b>sisa pagu</div></div></div></div>
 <div class="grid g4" style="margin-top:16px">
 ${sm('c1','🎯','Capaian target',`${pos} / ${K.length}`,`<span class="pos">${pos} deviasi positif</span> · <span class="neg">${neg} negatif</span>`)}
 ${sm('c2','📋','Pelaporan',`${upToDate} / ${K.length}`,`sudah update · jeda rata-rata ${jeda.toFixed(1).replace('.',',')} hari · terlama ${lag} hari`)}
@@ -331,7 +340,7 @@ function open_(i){
  <div class="kv"><div><span class="lbl">Fisik pelaksanaan</span><b>${P(k.fis)}</b><span class="note">rencana ${P(k.ren)}</span></div><div><span class="lbl">Realisasi keuangan</span><b>${P(k.keu)}</b><span class="note">${M(k.real)}</span></div><div><span class="lbl">Deviasi</span><b class="${k.dev>=0?'pos':'neg'}">${k.dev>=0?'+':''}${(k.dev*100).toFixed(1).replace('.',',')} pp</b></div><div><span class="lbl">Total pagu</span><b>${M(k.pagu)}</b></div><div><span class="lbl">Update terakhir</span><b>${tgl(k.upd)}</b><span class="note">${k.hk} hari kerja lalu</span></div><div><span class="lbl">Tahapan</span><b style="font-size:15px">${k.tl}</b><span class="note">${k.tp}</span></div></div>
  <div class="chart" style="height:260px"><canvas id="cDet"></canvas></div>
  <div class="kv" style="margin-bottom:0">${cn.map((c,j)=>`<div><span class="lbl">${c}</span><b style="font-size:15px">${M(k.rc[j])}</b><span class="note">pagu ${M(k.comp[j])}</span></div>`).join('')}</div>
- <p class="note" style="margin-top:10px">Kontrak fisik: ${k.ks?tgl(k.ks)+' – '+tgl(k.ke):'belum diisi'}${k.sisa!==''&&k.sisa!=='-'?` · sisa masa kerja ${k.sisa} hari`:''}</p>
+ <p class="note" style="margin-top:10px">Kontrak fisik: ${k.ks?tgl(k.ks)+' – '+tgl(k.ke):'belum diisi'}${masa(k)?(masa(k).sisa>=0?` · sisa masa kerja ${masa(k).sisa} hari`:` · lewat ${-masa(k).sisa} hari dari tanggal selesai`):''}</p>
  <p style="margin-top:14px"><button class="btn" onclick="goRekap(${i})">Buka rekap lengkap →</button></p>${blk('Kategori kendala',k.kat)}${blk('Kendala',k.kd)}${blk('Tindak lanjut',k.tin)}${blk('Strategi percepatan',k.str)}${blk('Catatan',k.cat)}`;
  $('#md').classList.add('on');document.body.style.overflow='hidden';
  const line=clr('--line');
@@ -344,6 +353,7 @@ addEventListener('keydown',e=>{if(e.key==='Escape')close_()});
 let rkI=0;
 const esc=s=>String(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const rp=v=>'Rp '+new Intl.NumberFormat('id-ID').format(Math.round(v));
+const masa=k=>{if(!k.ke)return null;const T=new Date(D.date+'T00:00:00'),e=new Date(k.ke+'T00:00:00'),b=k.ks?new Date(k.ks+'T00:00:00'):null,sisa=Math.round((e-T)/864e5),tot=b?Math.round((e-b)/864e5)+1:0;return{sisa,tot,pct:tot>1?Math.min(1,Math.max(0,(T-b)/864e5/tot)):null}};
 const dur=(a,b)=>a&&b?Math.round((new Date(b)-new Date(a))/864e5)+1:null;
 $('#rkSel').innerHTML=K.map((k,i)=>`<option value="${i}">${k.n}</option>`).join('');
 $('#rkSel').onchange=e=>renderRekap(+e.target.value);
@@ -355,21 +365,22 @@ function renderRekap(i){
  const cn=['Perencanaan','Pelaksanaan','Supervisi','Wasdal'],kv=(l,v)=>`<div class="kvr"><span>${l}</span><b>${esc(v)||'–'}</b></div>`;
  const sec=(n,t,b)=>`<section class="sec"><h3><span class="no">${n}</span>${t}</h3>${b}</section>`;
  const txt=(t,v)=>`<div class="blk"><strong>${t}</strong>${v?esc(v):'<span class="note">Belum ada uraian</span>'}</div>`;
- const tile=(c,l,v,x='')=>`<div class="tile ${c}"><span class="lbl">${l}</span><b>${v}</b>${x}</div>`;
+ const tile=(c,l,v,x='')=>`<div class="tile ${c}${/^Rp.{11,}/.test(v)?' m':''}"><span class="lbl">${l}</span><b>${v}</b>${x}</div>`;
  const bar=(v,c)=>`<div class="bar" style="margin-top:8px"><i style="width:${Math.min(v*100,100)}%;${c?'background:'+c:''}"></i></div>`;
- const ds=dur(k.ks,k.ke),sisa=k.sisa===''?null:+k.sisa;
- const sp=sisa===null?'–':sisa<0?`<span class="pill er">Terlambat ${-sisa} hari</span>`:`<span class="pill ok">Aktif · ${sisa} hari</span>`;
+ const ds=dur(k.ks,k.ke),ms=masa(k);
+ const sp=!ms?'<span class="pill wa">Tanggal kontrak belum diisi</span>':ms.sisa<0?`<span class="pill er">Lewat ${-ms.sisa} hari dari tanggal selesai</span>`:ms.sisa===0?'<span class="pill wa">Berakhir hari ini</span>':`<span class="pill ${ms.sisa<=14?'wa':'ok'}">${ms.sisa} hari lagi (s.d. ${tgl(k.ke)})</span>`;
+ const wk2=ms&&ms.pct!=null?`<div class="kvr"><span>Waktu kontrak terpakai</span><b>${P(ms.pct)} <span class="note">· fisik ${P(k.fis)}</span></b></div><div style="padding:2px 0 6px">${bar(ms.pct,ms.pct>k.fis+.1?'linear-gradient(90deg,var(--amber),var(--red))':'')}</div>`:'';
  const H=[...k.h].reverse().slice(0,20);
  const rows=H.map(h=>`<tr style="cursor:default"><td style="white-space:nowrap">${tgl(h.d)}</td><td>${esc(h.pic)}</td><td>${esc(h.tl)}</td><td style="white-space:nowrap">${rp(sum(h.c))}</td><td>${P(h.fp)}</td><td>${P(h.fl)}</td><td><div class="clip" onclick="this.classList.toggle('open')">${esc(h.cat)||'–'}</div></td><td><div class="clip" onclick="this.classList.toggle('open')">${esc(h.kd)||'–'}</div></td><td><div class="clip" onclick="this.classList.toggle('open')">${esc(h.tin)||'–'}</div></td></tr>`).join('');
  $('#rkBody').innerHTML=`<div class="grid g2" style="margin-top:0">
  ${sec(1,'Identitas penanganan kumuh',kv('Nama kawasan',k.n)+kv('PIC',k.pic)+kv('Balai penanggung jawab',k.balai)+kv('Provinsi',k.prov)+kv('Kabupaten / Kota',k.kab)+kv('Kecamatan / Desa / Kelurahan',k.kec)+kv('Tahun anggaran','2026')+kv('Total pagu',rp(k.pagu)))}
  ${sec(2,'Pagu anggaran per komponen',`<div class="tw"><table><thead><tr><th>Komponen</th><th>Pagu</th><th>% total</th><th>Realisasi</th></tr></thead><tbody>${cn.map((c,j)=>`<tr style="cursor:default"><td>${c}</td><td>${rp(k.comp[j])}</td><td>${P(k.comp[j]/k.pagu)}</td><td>${rp(k.rc[j])}</td></tr>`).join('')}<tr class="tot" style="cursor:default"><td>Total</td><td>${rp(k.pagu)}</td><td>100%</td><td>${rp(k.real)}</td></tr></tbody></table></div><div class="chart" style="height:200px;margin-top:10px"><canvas id="cRkD"></canvas></div>`)}
  </div>
- ${sec(3,'Ringkasan progres terbaru',`<div class="tiles">${tile('g1','% Fisik pelaksanaan',P(k.fis),bar(k.fis))}${tile('g2','% Keuangan',P(k.keu),bar(k.keu,'linear-gradient(90deg,var(--teal),var(--green))'))}${tile('','% Rencana pelaksanaan',P(k.ren))}${tile('',`% Deviasi`,`<span class="${k.dev>=0?'pos':'neg'}">${k.dev>=0?'+':''}${(k.dev*100).toFixed(1).replace('.',',')} pp</span>`)}${tile('','% Fisik perencanaan',P(k.pp))}${tile('','Realisasi keuangan',rp(k.real).replace('Rp ','Rp&nbsp;'))}${tile('','Update terakhir',tgl(k.upd),`<span class="note">${k.hk} hari kerja lalu</span>`)}${tile('','Status',`<span class="pill ${s[0]}" style="font-size:14px">${s[1]}</span>`)}${tile('','Tahapan perencanaan',`<span style="font-size:16px">${esc(k.tp)}</span>`)}${tile('','Tahapan pelaksanaan',`<span style="font-size:16px">${esc(k.tl)}</span>`)}</div>`)}
+ ${sec(3,'Ringkasan progres terbaru',`<div class="tiles">${tile('g1','% Fisik pelaksanaan',P(k.fis),bar(k.fis))}${tile('g2','% Keuangan',P(k.keu),bar(k.keu,'linear-gradient(90deg,var(--teal),var(--green))'))}${tile('','% Rencana pelaksanaan',P(k.ren))}${tile('',`% Deviasi`,`<span class="${k.dev>=0?'pos':'neg'}">${k.dev>=0?'+':''}${(k.dev*100).toFixed(1).replace('.',',')} pp</span>`)}${tile('','% Fisik perencanaan',P(k.pp))}${tile('','Realisasi keuangan',M(k.real),`<span class="note">${rp(k.real)}</span>`)}${tile('','Update terakhir',tgl(k.upd),`<span class="note">${k.hk} hari kerja lalu</span>`)}${tile('','Status',`<span class="pill ${s[0]}" style="font-size:14px">${s[1]}</span>`)}${tile('','Tahapan perencanaan',`<span style="font-size:16px">${esc(k.tp)}</span>`)}${tile('','Tahapan pelaksanaan',`<span style="font-size:16px">${esc(k.tl)}</span>`)}</div>`)}
  ${sec(4,'Grafik fisik dan anggaran',`<div class="chart" style="height:300px"><canvas id="cRk"></canvas></div>`)}
  <div class="grid g2" style="margin-top:0">
  ${sec(5,'Catatan dan analisis laporan terbaru',txt('Catatan terbaru',k.cat)+txt('Kendala',k.kd)+txt('Tindak lanjut',k.tin)+txt('Strategi percepatan',k.str))}
- ${sec(6,'Kontrak pelaksanaan fisik',kv('Tanggal mulai',tgl(k.ks))+kv('Tanggal selesai',tgl(k.ke))+kv('Durasi kontrak',ds?ds+' hari':'–')+`<div class="kvr"><span>Sisa masa kerja</span><b>${sp}</b></div>`)}
+ ${sec(6,'Kontrak pelaksanaan fisik',kv('Tanggal mulai',tgl(k.ks))+kv('Tanggal selesai',tgl(k.ke))+kv('Durasi kontrak',ds?ds+' hari':'–')+`<div class="kvr"><span>Sisa masa kerja</span><b>${sp}</b></div>`+wk2)}
  </div>
  ${sec(7,`Riwayat laporan kawasan <span class="note" style="font-weight:400">· ${H.length} laporan terakhir · klik teks untuk memperluas</span>`,`<div class="tw"><table><thead><tr><th>Tanggal</th><th>PIC</th><th>Tahap</th><th>Total realisasi</th><th>% Perenc.</th><th>% Pelaks.</th><th>Catatan</th><th>Kendala</th><th>Tindak lanjut</th></tr></thead><tbody>${rows}</tbody></table></div>`)}`;
  const line=clr('--line'),blue=clr('--blue'),amber=clr('--amber');
@@ -391,7 +402,7 @@ function renderBalai(){
  const low=[...BL].sort((a,b)=>a.ser-b.ser)[0];
  const kc={};BL.forEach(b=>{kc[b.kd||'–']=(kc[b.kd||'–']||0)+1});const kk=Object.entries(kc).sort((a,b)=>b[1]-a[1]);
  const stale=BL.filter(b=>b.sts==='Belum update').sort((a,b)=>b.hk-a.hk);
- $('#bKpi').innerHTML=`<div class="g2k"><div class="hk f"><div class="top"><div><div class="lbl">Serapan anggaran</div><div class="big">${P(bSer)}</div><div class="note">${M(bReal)} dari ${M(bTot)} · ${BL.length} balai</div></div>${ring(bSer)}</div>${spark(BT.map(t=>t[1]))}<div class="mini"><div><b>${M(bTot-bReal)}</b>sisa anggaran</div><div><b>+${M(naik)}</b>naik dari update sebelumnya</div></div></div>
+ $('#bKpi').innerHTML=`<div class="g2k"><div class="hk f"><div class="top"><div><div class="lbl">Serapan anggaran</div><div class="big">${P(bSer)}</div><div class="note">${M(bReal)} dari ${M(bTot)} · ${BL.length} balai</div></div>${ring(bSer)}</div><div class="mini"><div><b>${M(bTot-bReal)}</b>sisa anggaran</div><div><b>+${M(naik)}</b>naik dari update sebelumnya</div></div></div>
  <div class="hk a"><div class="lbl">Sebaran status ${BL.length} balai</div><div class="big">${dsm[1]}<span style="font-size:20px;font-weight:500"> berjalan</span></div><div class="note">Belum update = data terakhir lebih dari 7 hari kerja lalu</div><div style="display:flex;height:12px;border-radius:9px;overflow:hidden;background:rgba(255,255,255,.25);margin-top:22px">${dsm.map((v,i)=>v?`<i style="width:${v/BL.length*100}%;background:${['#fff','rgba(255,255,255,.65)','#ffb4b4','#ffe08a'][i]}"></i>`:'').join('')}</div><div class="mini">${SS.map((s,i)=>`<div><b>${dsm[i]} · ${Math.round(dsm[i]/BL.length*100)}%</b>${s[0]}</div>`).join('')}</div></div></div>
  <div class="grid g4" style="margin-top:16px">${sm('c1','💰','Total pagu',M(bTot).replace('Rp ',''),'Tahun anggaran 2026')}${sm('c4','✅','Realisasi anggaran',M(bReal).replace('Rp ',''),P(bSer)+' dari pagu')}${sm('c2','⚠️','Serapan terendah',P(low.ser),low.s)}${sm('c3','🕑','Belum update',stale.length+' / '+BL.length,stale.length?'terlama '+stale[0].hk+' hari kerja':'semua sudah update')}</div>`;
  $('#bTbl').innerHTML=stale.map((b,i)=>`<tr data-b="${BL.indexOf(b)}"><td>${i+1}</td><td><b style="font-weight:600">${b.s}</b></td><td>${b.pic}</td><td>${b.hk} hari kerja</td><td>${tgl(b.upd)}</td><td><span class="pill wa">Belum update</span></td></tr>`).join('')||'<tr><td colspan="6" class="note">Semua balai sudah update.</td></tr>';
@@ -428,7 +439,7 @@ $('#rbP').onclick=()=>renderRkB((rbI+BL.length-1)%BL.length);$('#rbN').onclick=(
 function renderRkB(i){
  rbI=i;const b=BL[i],s=bst(b);$('#rbSel').value=i;
  $('#rbTitle').textContent=b.n;$('#rbSub').textContent=`PIC ${b.pic} · update terakhir ${tgl(b.upd)} · status: ${s[1]}`;
- const kv=(l,v)=>`<div class="kvr"><span>${l}</span><b>${esc(v)||'–'}</b></div>`,sec=(n,t,x)=>`<section class="sec"><h3><span class="no">${n}</span>${t}</h3>${x}</section>`,txt=(t,v)=>`<div class="blk"><strong>${t}</strong>${v?esc(v):'<span class="note">Belum ada uraian</span>'}</div>`,tile=(c,l,v,x='')=>`<div class="tile ${c}"><span class="lbl">${l}</span><b>${v}</b>${x}</div>`;
+ const kv=(l,v)=>`<div class="kvr"><span>${l}</span><b>${esc(v)||'–'}</b></div>`,sec=(n,t,x)=>`<section class="sec"><h3><span class="no">${n}</span>${t}</h3>${x}</section>`,txt=(t,v)=>`<div class="blk"><strong>${t}</strong>${v?esc(v):'<span class="note">Belum ada uraian</span>'}</div>`,tile=(c,l,v,x='')=>`<div class="tile ${c}${/^Rp.{11,}/.test(v)?' m':''}"><span class="lbl">${l}</span><b>${v}</b>${x}</div>`;
  const H=[...b.h].reverse().slice(0,20);
  $('#rbBody').innerHTML=`<div class="grid g2" style="margin-top:0">${sec(1,'Identitas balai',kv('Nama balai',b.n)+kv('Nama singkat',b.s)+kv('PIC',b.pic)+kv('Kawasan kumuh yang ditangani',b.kaw)+kv('Tahun anggaran','2026')+kv('Pagu anggaran',rp(b.pagu))+kv('Update terakhir',tgl(b.upd))+kv('Hari kerja sejak update',b.hk+' hari'))}
  ${sec(2,'Ringkasan progres terbaru',`<div class="tiles">${tile('g1','Serapan anggaran',P(b.ser),`<div class="bar" style="margin-top:8px"><i style="width:${Math.min(b.ser*100,100)}%"></i></div>`)}${tile('g2','Realisasi keuangan',rp(b.real).replace('Rp ','Rp&nbsp;'))}${tile('','Sisa anggaran',rp(b.sisa).replace('Rp ','Rp&nbsp;'))}${tile('','Naik dari update sebelumnya',rp(b.naik).replace('Rp ','Rp&nbsp;'))}${tile('','Status',`<span class="pill ${s[0]}" style="font-size:14px">${s[1]}</span>`)}</div>`)}</div>
