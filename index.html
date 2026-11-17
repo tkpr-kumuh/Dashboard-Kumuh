@@ -6,10 +6,11 @@
 <meta name="theme-color" content="#f5f6fa" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#0c0e14" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <title>Divisi Penanganan Kumuh – Satgasus Pujaperi, Ditjen TKPR, KemenPKP</title>
+<script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{--bg:#f6f7fb;--solid:#fff;--card:#fff;--ink:#16181d;--mute:#6b7280;--line:#e6e8ee;--soft:#f1f3f8;--blue:#3478f6;--violet:#7c6cf0;--teal:#14a38b;--green:#16a34a;--amber:#e8a317;--red:#e5484d;--shadow:0 1px 2px rgba(16,24,40,.04)}
-@media(prefers-color-scheme:dark){:root{--bg:#0c0e14;--solid:#161922;--card:#161922;--ink:#eceef4;--mute:#9097a8;--line:#272b37;--soft:#1f232d;--blue:#5b94f8;--violet:#9b8cff;--teal:#2dc4a8;--green:#34d399;--amber:#f0b429;--red:#ff6b70;--shadow:none}}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#0c0e14;--solid:#161922;--card:#161922;--ink:#eceef4;--mute:#9097a8;--line:#272b37;--soft:#1f232d;--blue:#5b94f8;--violet:#9b8cff;--teal:#2dc4a8;--green:#34d399;--amber:#f0b429;--red:#ff6b70;--shadow:none}}
 *{box-sizing:border-box;margin:0}
 html{scroll-behavior:smooth;scroll-padding-top:70px}
 body{background:radial-gradient(800px 380px at 10% -10%,rgba(52,120,246,.09),transparent 70%),var(--bg);color:var(--ink);font-family:"SF Pro Display","SF Pro Text",-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;font-size:15px}
@@ -174,6 +175,10 @@ footer{padding:22px 16px;font-size:12px}
 }
 @media(max-width:380px){.hk .big{font-size:40px}.hk .top svg{width:72px;height:72px}.g4 .card .big{font-size:20px!important}.tab{font-size:10.5px}}
 .blk .gn{text-transform:none;letter-spacing:0;font-size:15px;color:var(--ink);display:block;margin-bottom:4px}.blk .gn .note{font-weight:400;font-size:12.5px}
+:root[data-theme=dark]{color-scheme:dark;--bg:#0c0e14;--solid:#161922;--card:#161922;--ink:#eceef4;--mute:#9097a8;--line:#272b37;--soft:#1f232d;--blue:#5b94f8;--violet:#9b8cff;--teal:#2dc4a8;--green:#34d399;--amber:#f0b429;--red:#ff6b70;--shadow:none}
+:root[data-theme=light]{color-scheme:light}
+.anc{display:none!important}
+@media(max-width:760px){nav b{min-width:0;white-space:normal!important}}@media(max-width:420px){#thm{padding:2px;margin-left:6px}#thm button{width:30px;height:32px}nav b{font-size:14px}}
 </style>
 </head>
 <body>
@@ -357,8 +362,8 @@ function draw(){
  const lg={position:'bottom',labels:{usePointStyle:true,boxWidth:8}},ax=g=>({grid:g?{color:line}:{display:false},border:{display:false}});
  const so=[...K].sort((a,b)=>b.fis-a.fis);
  mk('cProg',{type:'bar',data:{labels:so.map(k=>k.s),datasets:[{label:'Fisik (%)',data:so.map(k=>+(k.fis*100).toFixed(1)),backgroundColor:G(blue,vio,true),borderRadius:5,borderSkipped:false},{label:'Rencana (%)',data:so.map(k=>+(k.ren*100).toFixed(1)),backgroundColor:'rgba(150,160,190,.30)',borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:lg},scales:{x:{...ax(1),max:100},y:ax(0)}}});
- const tw=D.tr.map(t=>t[1]);
- mk('cTot',{type:'bar',data:{labels:D.tr.map(t=>tgl(t[0]).slice(0,-5)),datasets:[{label:'Total realisasi (Rp M)',data:tw.map(v=>+v.toFixed(2)),backgroundColor:G(teal,green),borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:ax(0),y:ax(1)}}});
+ const tw=W.map((_,w)=>sum(K.map(k=>(k.kh[w]||0)*k.pagu))/1e9);
+ mk('cTot',{type:'bar',data:{labels:W,datasets:[{label:'Total realisasi (Rp M)',data:tw.map(v=>+v.toFixed(2)),backgroundColor:G(teal,green),borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:ax(0),y:ax(1)}}});
  mk('cAvg',{type:'line',data:{labels:W,datasets:[lineSet('Fisik (%)',blue,W.map((_,w)=>+(avg(K.map(k=>k.fh[w]))*100).toFixed(1))),lineSet('Keuangan (%)',amber,W.map((_,w)=>+(avg(K.map(k=>k.kh[w]))*100).toFixed(1)))]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:lg},scales:{x:ax(0),y:{...ax(1),beginAtZero:true}}}});
  const kc=Object.entries(cnt(k=>/^tidak ada/i.test(k.kat)?'':k.kat)).sort((a,b)=>b[1]-a[1]);
  mk('cKen',{type:'bar',data:{labels:kc.map(e=>e[0]),datasets:[{label:'Jumlah kawasan',data:kc.map(e=>e[1]),backgroundColor:G(amber,red,true),borderRadius:5,borderSkipped:false}]},options:{...clk(l=>grp('Kendala: '+l,'kawasan',K.map((k,i)=>[k,i]).filter(([k])=>(k.kat||'')===nk(l)).map(([k,i])=>({n:k.s,m:'PIC '+k.pic+' · fisik '+P(k.fis)+' · deviasi '+(k.dev>=0?'+':'')+(k.dev*100).toFixed(1).replace('.',',')+'%',t:k.kd,go:'goRekap('+i+')'})))),responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{...ax(1),ticks:{stepSize:1}},y:{...ax(0),ticks:{callback(v){const l=this.getLabelForValue(v);const n=innerWidth<600?16:30;return l.length>n?l.slice(0,n-1)+'…':l}}}}}});
@@ -664,6 +669,28 @@ pn.querySelector('#qx').onclick=()=>{ctx=null;hello()};
 pn.querySelector('#qg').onclick=()=>ask();inp.onkeydown=e=>{if(e.key==='Enter')ask()};
 pn.onclick=e=>{const c=e.target.closest('[data-q]');if(c){ask(c.dataset.q);return}const a=e.target.closest('.ql');if(a){const i=+a.dataset.i;if(innerWidth<=760){pn.classList.remove('on');bt.style.display=''}a.dataset.t==='k'?goRekap(i):goRkB(i)}};
 window.qaAnswer=answer;
+})();
+
+// ===== TEMA: otomatis / terang / gelap =====
+(()=>{
+const root=document.documentElement,dq=matchMedia('(prefers-color-scheme:dark)');
+let mode='auto';try{mode=localStorage.getItem('theme')||'auto'}catch(e){}
+if(mode!=='light'&&mode!=='dark')mode='auto';
+const box=document.createElement('span');box.id='thm';box.setAttribute('role','group');box.setAttribute('aria-label','Tema tampilan');
+box.innerHTML=[['auto','🌓','Otomatis (ikut perangkat)'],['light','☀️','Terang'],['dark','🌙','Gelap']].map(x=>`<button data-m="${x[0]}" title="${x[2]}" aria-label="${x[2]}">${x[1]}</button>`).join('');
+{const nv=document.querySelector('nav > div');nv.insertBefore(box,nv.querySelector('.sp')||null)}
+const st=document.createElement('style');st.textContent=`#thm{display:inline-flex;gap:2px;background:var(--soft);padding:3px;border-radius:99px;margin-left:10px;flex:none}#thm button{border:0;background:none;border-radius:99px;width:32px;height:30px;font-size:15px;cursor:pointer;line-height:1;opacity:.55;padding:0}#thm button.on{background:var(--solid);opacity:1;box-shadow:0 1px 3px rgba(0,0,0,.18)}@media(max-width:760px){#thm{margin-left:auto}#thm button{width:36px;height:34px}}`;
+document.head.appendChild(st);
+function redraw(){try{draw();if(!$('#pgRekap').hidden)renderRekap(rkI);if(!$('#pgBalai').hidden)bcharts();if(!$('#pgRkBalai').hidden)renderRkB(rbI)}catch(e){console.error(e)}}
+function apply(m,save,re){mode=m;m==='auto'?root.removeAttribute('data-theme'):root.setAttribute('data-theme',m);
+ if(save)try{m==='auto'?localStorage.removeItem('theme'):localStorage.setItem('theme',m)}catch(e){}
+ const dark=m==='dark'||(m==='auto'&&dq.matches);document.querySelectorAll('meta[name=theme-color]').forEach(x=>x.remove());
+ const t=document.createElement('meta');t.name='theme-color';t.content=dark?'#0c0e14':'#f5f6fa';document.head.appendChild(t);
+ box.querySelectorAll('button').forEach(b=>{const on=b.dataset.m===m;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});
+ if(re)setTimeout(redraw,30)}
+box.onclick=e=>{const b=e.target.closest('button');if(b)apply(b.dataset.m,true,true)};
+dq.addEventListener('change',()=>{if(mode==='auto')apply('auto',false,false)});
+apply(mode,false,mode!=='auto');
 })();
 </script>
 </body>
