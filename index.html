@@ -519,6 +519,148 @@ addEventListener('hashchange',route);
 function goRekap(i){close_();rkI=i;location.hash='#rekap'}
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{if(!$('#pgBalai').hidden)bcharts();if(!$('#pgRkBalai').hidden)renderRkB(rbI)});
 route();
+
+// ===== TANYA DATA (Jalur A+) =====
+(()=>{
+const KK=D.k,BB=BL,RM={i:1,ii:2,iii:3,iv:4,v:5,vi:6,vii:7,viii:8,ix:9,x:10};
+const nz=s=>(' '+String(s).toLowerCase().replace(/\([^)]*\)/g,' ').replace(/[^a-z0-9\s]/g,' ')+' ').replace(/\s(i|ii|iii|iv|v|vi|vii|viii|ix|x)(?=\s)/g,(m,a)=>' '+RM[a]).replace(/\s+/g,' ').trim();
+const lev=(a,b)=>{const m=a.length,n=b.length;if(!m)return n;let p=Array.from({length:n+1},(_,j)=>j);for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]};
+const sim=(a,b)=>1-lev(a,b)/Math.max(a.length,b.length);
+const dg=s=>(s.match(/\d+/g)||[]).join(',');
+const PW=new Set([...KK.flatMap(k=>[k.prov,k.kab,k.kec,k.balai]),...BB.map(b=>b.s)].join(' ').toLowerCase().split(/[^a-z]+/).filter(x=>x.length>=4));
+const has=(q,...w)=>w.some(x=>q.includes(x));
+const sg=v=>(v>=0?'+':'')+(v*100).toFixed(1).replace('.',',')+'%';
+const GEN=new Set('kawasan balai kampung kota kendala paling dengan yang tertinggi terendah progres fisik keuangan anggaran bandingkan ringkas tindak lanjut strategi update pagu realisasi serapan deviasi tentang untuk berapa jumlah total rata'.split(' '));
+const ENT=[];
+KK.forEach((k,i)=>ENT.push({t:'k',i,key:nz(k.s),al:[]}));
+BB.forEach((b,i)=>ENT.push({t:'b',i,key:nz(b.s),al:((b.s.match(/\(([^)]*)\)/)||[,''])[1].split(/[,&]|\bdan\b/).map(nz).filter(x=>x.length>=3))}));
+function findEnts(qn){const tk=qn.split(' '),full=' '+qn+' ',res=[];
+ ENT.forEach(e=>{let sc=0;const L=e.key.split(' ').length;
+  if(full.includes(' '+e.key+' '))sc=1;
+  else if(e.key.length>=5)for(let s=0;s+L<=tk.length;s++){const w=tk.slice(s,s+L).join(' '),v=sim(w,e.key);if(v>=.82&&v>sc&&dg(w)===dg(e.key))sc=v}
+  if(!sc)e.al.forEach(a=>{if(full.includes(' '+a+' '))sc=.9});
+  if(sc)res.push({...e,sc})});
+ if(!res.length)tk.forEach(t=>{if(t.length<4||GEN.has(t)||PW.has(t))return;const h=ENT.filter(e=>e.key.split(' ').some(x=>x.length>=4&&(x===t||sim(x,t)>=.85)));['k','b'].forEach(tp=>{const hh=h.filter(e=>e.t===tp);if(hh.length===1)res.push({...hh[0],sc:.6})})});
+ const seen=new Set();return res.sort((a,b)=>b.sc-a.sc).filter(e=>{const k=e.t+e.i;return seen.has(k)?false:seen.add(k)})}
+const MD={k:{fis:['Fisik',k=>k.fis,P],keu:['Keuangan',k=>k.keu,P],dev:['Deviasi',k=>k.dev,sg],pagu:['Pagu',k=>k.pagu,M],real:['Realisasi',k=>k.real,M],hk:['Tanpa update',k=>k.hk,v=>v+' hr']},
+ b:{ser:['Serapan',b=>b.ser,P],pagu:['Pagu',b=>b.pagu,rp],real:['Realisasi',b=>b.real,rp],sisa:['Sisa',b=>b.sisa,rp],hk:['Tanpa update',b=>b.hk,v=>v+' hr']}};
+function metric(qn,d){if(has(qn,'deviasi','selisih'))return d==='b'?'ser':'dev';if(has(qn,'serapan','keuangan','anggaran','dana','biaya'))return d==='b'?'ser':'keu';if(has(qn,'pagu'))return'pagu';if(has(qn,'sisa'))return d==='b'?'sisa':'pagu';if(has(qn,'realisasi')&&!has(qn,'fisik'))return'real';if(has(qn,'hari','update','lapor','terlama'))return'hk';return d==='b'?'ser':'fis'}
+const FR={fis:1,keu:1,ser:1,dev:1};
+function filters(q,qn,d){const f=[],L=[],arr=d==='b'?BB:KK,fq=' '+qn+' ';
+ [...new Set(arr.map(x=>x.pic))].forEach(p=>{if(fq.includes(' '+p.toLowerCase()+' ')){f.push(x=>x.pic===p);L.push('PIC '+p)}});
+ if(d==='k'){[...new Set(KK.map(k=>k.prov))].forEach(p=>{if(p&&fq.includes(' '+nz(p)+' ')){f.push(x=>x.prov===p);L.push(p)}});
+  if(has(qn,'tertinggal','negatif','di bawah rencana')&&!has(qn,'tertinggi')){f.push(k=>k.dev<0);L.push('tertinggal dari rencana')}
+  if(has(qn,'sesuai rencana','di atas rencana','positif','melampaui','on track')){f.push(k=>k.dev>=0);L.push('sesuai/di atas rencana')}}
+ if(has(qn,'belum update','tidak update','belum lapor','telat lapor')){f.push(x=>x.sts==='Belum update'||x.hk>7);L.push('belum update')}
+ if(has(qn,'terhambat')){f.push(x=>/terhambat/i.test(x.sts));L.push('terhambat')}
+ if(has(qn,'selesai')&&d==='b'){f.push(x=>/selesai/i.test(x.sts));L.push('selesai')}
+ const th=q.match(/(di ?bawah|kurang dari|lebih kecil dari|di ?atas|lebih dari|lebih besar dari|minimal|maksimal|<|>)\s*(\d+(?:[.,]\d+)?)\s*(%|hari)?/);
+ if(th){const m=th[3]==='hari'?'hk':metric(qn,d),lo=/bawah|kurang|kecil|maksimal|</.test(th[1]);let v=parseFloat(th[2].replace(',','.'));if(FR[m])v/=100;const g=MD[d][m][1];f.push(x=>lo?g(x)<v:g(x)>v);L.push(MD[d][m][0].toLowerCase()+(lo?' < ':' > ')+(FR[m]?P(v):v+(m==='hk'?' hari':'')))}
+ return{f,L}}
+const lk=(t,i,n)=>`<a class="ql" data-t="${t}" data-i="${i}">${esc(n)}</a>`;
+const kvl=(l,v)=>`<div class="qr"><span>${l}</span><b>${v||'–'}</b></div>`;
+const jn=(a,b)=>[a,b].filter(x=>x&&x!=='-').join(' — ')||'–';
+function prof(e,only){const k=e.t==='k'?KK[e.i]:BB[e.i];let r=[];
+ const all=e.t==='k'?{
+  Lokasi:()=>kvl('Lokasi',esc([k.kab,k.prov].filter(Boolean).join(', '))),PIC:()=>kvl('PIC',k.pic)+kvl('Balai',esc(k.balai)),
+  Fisik:()=>kvl('Fisik',`${P(k.fis)} <small>(rencana ${P(k.ren)}, deviasi ${sg(k.dev)})</small>`),
+  Anggaran:()=>kvl('Keuangan',`${P(k.keu)} <small>(${M(k.real)} dari ${M(k.pagu)})</small>`),
+  Update:()=>kvl('Update terakhir',`${tgl(k.upd)} <small>(${k.hk} hari kerja lalu)</small>`)+kvl('Status',esc(k.sts)),
+  Kendala:()=>kvl('Kendala',esc(jn(k.kat,k.kd))),'Tindak lanjut':()=>kvl('Tindak lanjut',esc(jn(k.tkat,k.tin))),Strategi:()=>kvl('Strategi',esc(jn(k.skat,k.str))),Catatan:()=>kvl('Catatan',esc(jn(k.ncat,k.cat)))
+ }:{
+  PIC:()=>kvl('PIC',k.pic)+kvl('Kawasan terkait',esc(k.kaw)),Anggaran:()=>kvl('Serapan',`${P(k.ser)} <small>(${rp(k.real)} dari ${rp(k.pagu)}; sisa ${rp(k.sisa)})</small>`),
+  Update:()=>kvl('Update terakhir',`${tgl(k.upd)} <small>(${k.hk} hari kerja lalu)</small>`)+kvl('Status',esc(k.sts)),
+  Kendala:()=>kvl('Kendala',esc(k.kd)),'Tindak lanjut':()=>kvl('Tindak lanjut',esc(k.tin)),Strategi:()=>kvl('Strategi',esc(k.str)),Catatan:()=>kvl('Catatan',esc(k.cat))};
+ if(only&&!all[only[0]]&&only[0]==='Fisik')only=['Anggaran'];
+ const ks=only&&only.length?only:Object.keys(all);
+ return`<b>${lk(e.t,e.i,k.n)}</b>${ks.filter(x=>all[x]).map(x=>all[x]()).join('')}`}
+function tbl(rows,cols,nw){return`<div class="qt${nw?' nw':''}"><table><thead><tr>${cols.map(c=>`<th>${c[0]}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td>${c[1](r)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
+function listOut(items,d,m,intro){const mm=MD[d][m],cols=[['Nama',r=>lk(d,r._i,r.s)],[mm[0],r=>`<b>${mm[2](mm[1](r))}</b>`]];
+ const ex=d==='k'?[['Fisik','fis'],['Keu','keu'],['Dev','dev']]:[['Serapan','ser'],['Status','sts']];
+ ex.forEach(x=>{if(x[1]!==m)cols.push([x[0],r=>x[1]==='sts'?esc(r.sts):MD[d][x[1]][2](MD[d][x[1]][1](r))])});cols.push(['PIC',r=>esc(r.pic)]);
+ return intro+tbl(items.slice(0,10),cols,1)+(items.length>10?`<div class="qn">Menampilkan 10 dari ${items.length}.</div>`:'')}
+const STOP=new Set('kendala masalah kawasan balai apa yang dengan tentang adalah mana ada sering muncul paling terkait soal berapa jumlah daftar tampilkan sebutkan saja dong tolong bisa dari untuk karena pada atau dan di ke ini itu nya'.split(' '));
+let ctx=null;
+const HELP='Saya menjawab langsung dari data dashboard. Coba tanyakan:<ul><li>kawasan dengan fisik tertinggi / 5 terendah</li><li>kawasan PIC Diva yang tertinggal dan keuangan di bawah 20%</li><li>kendala Dok IX, lalu lanjut: tindak lanjutnya?</li><li>balai yang belum update</li><li>kendala yang paling sering muncul</li><li>bandingkan Sumatera I dan Sumatera II</li><li>total pagu / rata-rata fisik PIC Agil</li></ul>';
+function answer(text){
+ const q=text.toLowerCase().trim(),qn=nz(q);if(!qn)return HELP;
+ if(/^(halo|hai|hi|help|bantuan|menu|apa saja|bisa apa)/.test(qn))return'Halo! '+HELP;
+ let ents=findEnts(qn);const FLDQ=has(qn,'kendala','masalah','tindak lanjut','strategi','catatan','anggaran','keuangan','pagu','realisasi','serapan','fisik','progres','update','ringkas','kondisi','detail','info','profil');
+ const rank=has(qn,'tertinggi','terbesar','terbaik','teratas','terbanyak','tercepat','terendah','terkecil','terburuk','terbawah','terlama','terlambat','paling','top ');
+ const listy=has(qn,'daftar','tampilkan','sebutkan','mana','siapa','berapa','jumlah','apa saja')||/\bbalai\b|\bkawasan\b/.test(qn);
+ const follow=!ents.length&&ctx&&FLDQ&&!rank&&!has(qn,'berapa','jumlah','total','rata','daftar','semua','sering')&&!/\b(balai|kawasan)\b/.test(qn);
+ if(follow)ents=[{t:ctx.t,i:ctx.i,sc:1}];
+ const d0=(ents[0]&&ents[0].t)||(has(qn,'balai')&&!has(qn,'kawasan')||has(qn,'serapan')&&!has(qn,'kawasan')?'b':'k');
+ // compare
+ if(ents.length>=2&&ents[0].t===ents[1].t&&(has(qn,'bandingkan','banding','vs','versus','dengan','dan')||ents.length===2)){const t=ents[0].t,a=ents.slice(0,3).map(e=>({...(t==='k'?KK:BB)[e.i],_i:e.i}));
+  const rowsK=[['Fisik',k=>P(k.fis)],['Rencana',k=>P(k.ren)],['Deviasi',k=>sg(k.dev)],['Keuangan',k=>P(k.keu)],['Pagu',k=>M(k.pagu)],['Realisasi',k=>M(k.real)],['PIC',k=>k.pic],['Update',k=>k.hk+' hr lalu']],rowsB=[['Serapan',b=>P(b.ser)],['Pagu',b=>rp(b.pagu)],['Realisasi',b=>rp(b.real)],['Sisa',b=>rp(b.sisa)],['PIC',b=>b.pic],['Status',b=>b.sts],['Update',b=>b.hk+' hr lalu']];
+  ctx={t,i:a[0]._i};return`Perbandingan ${a.map(x=>esc(x.s)).join(' vs ')}:`+tbl(t==='k'?rowsK:rowsB,[['',r=>`<b>${r[0]}</b>`],...a.map(x=>[lk(t,x._i,x.s),r=>esc(r[1](x))])])}
+ // single entity
+ if(ents.length){const e=ents[0];ctx={t:e.t,i:e.i};const m={Kendala:'kendala masalah',['Tindak lanjut']:'tindak lanjut',Strategi:'strategi',Catatan:'catatan',Anggaran:'anggaran keuangan pagu realisasi serapan',Fisik:'fisik progres',Update:'update lapor'};
+  let only=Object.keys(m).filter(k=>has(qn,...m[k].split(' ')));if(has(qn,'ringkas','kondisi','detail','info','profil'))only=[];
+  return(follow?'':'')+`<div class="qc2">${prof(e,only)}</div>`}
+ const dom=d0,arr=dom==='b'?BB:KK,{f,L}=filters(q,qn,dom),m=metric(qn,dom);
+ const items=arr.map((x,i)=>({...x,_i:i})).filter(x=>f.every(g=>g(x)));
+ const lab=L.length?' ('+L.join(', ')+')':'',nm=dom==='b'?'balai':'kawasan';
+ // frequency
+ if(has(qn,'kendala','masalah','tindak lanjut')&&has(qn,'sering','umum','terbanyak','dominan','ranking','apa saja','semua','paling banyak')){const tl=has(qn,'tindak lanjut'),c={};items.forEach(x=>{const k=(dom==='b'?(tl?x.tin:x.kd):(tl?x.tkat:x.kat))||'–';c[k]=(c[k]||0)+1});
+  const r=Object.entries(c).sort((a,b)=>b[1]-a[1]);return`${tl?'Tindak lanjut':'Kendala'} yang paling sering muncul${lab}:`+tbl(r,[['Kategori',x=>esc(x[0])],['Jumlah '+nm,x=>`<b>${x[1]}</b>`]])}
+ // kendala keyword search
+ const ktok=qn.split(' ').map(t=>t.replace(/nya$/,'')).filter(t=>t.length>=4&&!STOP.has(t)&&!GEN.has(t));
+ if(has(qn,'kendala','masalah')&&ktok.length){const hay=x=>(dom==='b'?[x.kd,x.cat,x.tin,x.str]:[x.kat,x.kd,x.cat,x.tin,x.str]).join(' ').toLowerCase(),sc=x=>ktok.filter(t=>hay(x).split(/[^a-z]+/).some(w=>w===t||(t.length>=5&&sim(w,t)>=.85))).length;
+  const r=items.map(x=>({x,s:sc(x)})).filter(o=>o.s).sort((a,b)=>b.s-a.s).map(o=>o.x);
+  if(r.length)return`${r.length} ${nm} dengan kendala terkait “${esc(ktok.join(' '))}”${lab}:`+tbl(r.slice(0,10),[['Nama',x=>lk(dom,x._i,x.s)],['Kendala',x=>esc(dom==='b'?x.kd:jn(x.kat,x.kd))],['PIC',x=>esc(x.pic)]])}
+ // aggregate
+ if(has(qn,'total','rata','rerata','jumlah pagu')&&!has(qn,'berapa kawasan','berapa balai')){const g=MD[dom][m][1],vs=items.map(g),S=vs.reduce((a,b)=>a+b,0);let v,ty;
+  if(has(qn,'rata','rerata')){v=S/(vs.length||1);ty='Rata-rata'}else if(m==='keu'||m==='ser'){v=items.reduce((a,x)=>a+x.real,0)/(items.reduce((a,x)=>a+x.pagu,0)||1);ty='Total'}else{v=S;ty='Total'}
+  return`${ty} ${MD[dom][m][0].toLowerCase()} ${items.length} ${nm}${lab}: <b>${MD[dom][m][2](v)}</b>`}
+ // ranking
+ const hiW=has(qn,'tertinggi','terbesar','terbaik','teratas','terbanyak','tercepat','paling tinggi','paling besar','top '),loW=has(qn,'terendah','terkecil','terburuk','terbawah','paling rendah','paling kecil','paling sedikit','paling lambat');
+ const worst=has(qn,'tertinggal','terlama','terlambat','paling lama');
+ if(hiW||loW||worst){let mm=m;if(worst&&!has(qn,'fisik','keuangan','serapan','anggaran','update','hari','terlama'))mm=dom==='b'?'hk':'dev';if(has(qn,'terlama','terlambat'))mm='hk';
+  const g=MD[dom][mm][1];let asc=loW||(worst&&mm==='dev');if(mm==='hk')asc=has(qn,'tercepat','terbaru');
+  const nn=+((q.match(/(?:top\s*|^|\s)(\d{1,2})\s*(?:kawasan|balai|teratas|terbawah|tertinggi|terendah|terbesar|terkecil)?/)||[])[1])||5,sorted=items.sort((a,b)=>asc?g(a)-g(b):g(b)-g(a)),r=sorted.slice(0,Math.min(nn,10));
+  if(!r.length)return`Tidak ada ${nm} yang cocok${lab}.`;ctx={t:dom,i:r[0]._i};
+  return listOut(r,dom,mm,`${worst&&mm==='dev'?'Paling tertinggal':mm==='hk'&&!asc?'Terlama':asc?'Terendah':'Tertinggi'} — ${MD[dom][mm][0].toLowerCase()}${lab}: <b>${esc(r[0].s)}</b> (${MD[dom][mm][2](g(r[0]))}).`)+(items.length>r.length?'':'')}
+ // count / filtered list
+ if(L.length||has(qn,'daftar','tampilkan','sebutkan','berapa','jumlah')||(dom==='b'&&has(qn,'balai'))||has(qn,'kawasan mana','balai mana','siapa')){
+  if(!items.length)return`Tidak ada ${nm} yang cocok${lab}.`;
+  const mm=has(qn,'tertinggal')||L.some(x=>x.startsWith('tertinggal'))?'dev':L.includes('belum update')?'hk':m,g=MD[dom][mm][1],sr=items.sort((a,b)=>(mm==='dev'?g(a)-g(b):g(b)-g(a)));
+  ctx={t:dom,i:sr[0]._i};return listOut(sr,dom,mm,`Ada <b>${items.length}</b> ${nm}${lab}${items.length===arr.length&&!L.length?' (semua)':''}.`)}
+ return'Maaf, saya belum menangkap maksud pertanyaan itu. '+HELP}
+// ---- UI
+const st=document.createElement('style');st.textContent=`
+#qb{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;border:0;border-radius:99px;padding:11px 18px;font:600 14px inherit;font-family:inherit;color:#fff;background:var(--blue);box-shadow:0 6px 20px rgba(0,0,0,.22);cursor:pointer;min-height:44px}
+#qp{position:fixed;right:16px;bottom:16px;width:410px;max-width:calc(100vw - 32px);height:min(680px,calc(100dvh - 32px));z-index:120;background:var(--solid);border:1px solid var(--line);border-radius:20px;box-shadow:0 18px 50px rgba(0,0,0,.28);display:none;flex-direction:column;overflow:hidden}
+#qp.on{display:flex}
+.qh{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--line)}.qh b{flex:1;font-size:16px}.qh button{border:0;background:var(--soft);color:var(--ink);border-radius:99px;min-width:36px;height:36px;padding:0 12px;font:inherit;font-size:13px;cursor:pointer}
+#ql{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
+.qm{max-width:94%;padding:10px 13px;border-radius:16px;font-size:14px;line-height:1.45;overflow-wrap:anywhere}.qm.u{align-self:flex-end;background:var(--blue);color:#fff;border-bottom-right-radius:5px}.qm.a{align-self:flex-start;background:var(--soft);border-bottom-left-radius:5px;max-width:100%}
+.qm ul{padding-left:18px;margin-top:6px}.qm small{color:var(--mute)}.qn{color:var(--mute);font-size:12px;margin-top:6px}
+.qr{display:flex;flex-direction:column;padding:6px 0;border-bottom:1px solid var(--line)}.qr:last-child{border:0}.qr span{color:var(--mute);font-size:12px}.qr b{font-weight:500}.qc2>b{display:block;font-size:15px;margin-bottom:2px}
+.qt{overflow-x:auto;margin-top:8px}.qt table{font-size:12.5px}.qt th{cursor:default;padding:6px 8px}.qt td{padding:7px 8px;vertical-align:top}.qt.nw td{white-space:nowrap}.qt.nw td:first-child{white-space:normal;min-width:96px}.qt tbody tr{cursor:default}
+.ql{color:var(--blue);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.qcs{display:flex;gap:6px;overflow-x:auto;padding:0 14px 8px;scrollbar-width:none}.qcs::-webkit-scrollbar{display:none}.qcs button{flex:none;white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:7px 12px;font:inherit;font-size:12.5px;cursor:pointer}
+.qf{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}.qf input{flex:1;min-width:0;font-size:16px}.qf button{border:0;border-radius:12px;background:var(--blue);color:#fff;font:inherit;font-weight:600;padding:0 16px;min-height:44px;cursor:pointer}
+@media(max-width:760px){#qb{left:10px;bottom:calc(76px + env(safe-area-inset-bottom,0px));padding:10px 14px;font-size:13px}#qp{inset:0;width:auto;max-width:none;height:auto;border-radius:0;border:0}.qh{padding-top:calc(14px + env(safe-area-inset-top,0px))}}`;
+document.head.appendChild(st);
+const bt=document.createElement('button');bt.id='qb';bt.textContent='💬 Tanya Data';
+const pn=document.createElement('div');pn.id='qp';
+pn.innerHTML='<div class="qh"><b>💬 Tanya Data</b><button id="qx" title="Hapus percakapan">Bersihkan</button><button id="qc" aria-label="Tutup">✕</button></div><div id="ql"></div><div class="qcs" id="qs"></div><div class="qf"><input id="qi" placeholder="Tulis pertanyaan…" autocomplete="off" enterkeyhint="send"><button id="qg">Kirim</button></div>';
+document.body.append(bt,pn);
+const lg=pn.querySelector('#ql'),inp=pn.querySelector('#qi');
+const add=(c,h)=>{const d=document.createElement('div');d.className='qm '+c;d.innerHTML=h;lg.appendChild(d);lg.scrollTop=lg.scrollHeight};
+const ex=['Kawasan dengan fisik tertinggi','Kawasan yang tertinggal dari rencana','Balai yang belum update','Kendala yang paling sering muncul',`Ringkas ${KK[0].s}`,`Bandingkan ${KK[1].s} dan ${KK[2].s}`];
+pn.querySelector('#qs').innerHTML=ex.map(x=>`<button data-q="${esc(x)}">${esc(x)}</button>`).join('');
+const hello=()=>{lg.innerHTML='';add('a','Halo! Tanyakan apa saja tentang data kawasan dan balai. Jawaban dihitung langsung dari data dashboard, jadi angkanya sama dengan yang tampil di halaman.')};
+function ask(t){t=(t||inp.value).trim();if(!t)return;inp.value='';add('u',esc(t));let r;try{r=answer(t)}catch(e){console.error(e);r='Maaf, terjadi kesalahan saat membaca data.'}add('a',r+`<div class="qn">Sumber: data dashboard per ${tgl(D.date)}</div>`)}
+bt.onclick=()=>{pn.classList.add('on');bt.style.display='none';if(!lg.children.length)hello();setTimeout(()=>inp.focus({preventScroll:true}),50)};
+pn.querySelector('#qc').onclick=()=>{pn.classList.remove('on');bt.style.display=''};
+pn.querySelector('#qx').onclick=()=>{ctx=null;hello()};
+pn.querySelector('#qg').onclick=()=>ask();inp.onkeydown=e=>{if(e.key==='Enter')ask()};
+pn.onclick=e=>{const c=e.target.closest('[data-q]');if(c){ask(c.dataset.q);return}const a=e.target.closest('.ql');if(a){const i=+a.dataset.i;if(innerWidth<=760){pn.classList.remove('on');bt.style.display=''}a.dataset.t==='k'?goRekap(i):goRkB(i)}};
+window.qaAnswer=answer;
+})();
 </script>
 </body>
 </html>
