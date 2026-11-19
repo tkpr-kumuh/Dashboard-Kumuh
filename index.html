@@ -137,7 +137,7 @@ button,.tab,select{-webkit-tap-highlight-color:transparent}
 nav{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--bg);padding-top:env(safe-area-inset-top,0px)}
 nav div{height:auto;min-height:46px;padding:8px 16px;gap:10px;overflow:visible}
 nav b{margin:0}.anc,.sp{display:none!important}
-.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;border-radius:0;gap:2px;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--solid) 94%,transparent);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;border-radius:0;gap:2px;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--solid) 94%,transparent);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
 .tab{font-size:11.5px;line-height:1.2;padding:8px 4px;min-height:46px;border-radius:12px;white-space:normal;text-align:center}
 .tab.on{background:var(--soft);color:var(--blue);box-shadow:none;font-weight:600}
 body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
@@ -192,11 +192,18 @@ footer{padding:22px 16px;font-size:12px}
 .mi{background:var(--soft);border-radius:14px;padding:14px;font-size:14px;line-height:1.45}.mt{font-size:15px;font-weight:600;margin-bottom:2px}.mr{display:flex;flex-direction:column;padding:6px 0;border-bottom:1px solid var(--line)}.mr span{color:var(--mute);font-size:12px}.mr b{font-weight:500}.mr small{color:var(--mute);font-weight:400}
 .mgo{display:inline-block;margin-top:10px;color:var(--blue);font-weight:600;cursor:pointer}
 @media(max-width:760px){.mapc{grid-template-columns:1fr}.ml{display:none}.mk .dot{transform:scale(1.35)}.mk:hover .dot,.mk.sel .dot{transform:scale(1.7)}}
+.subt{display:flex;gap:8px;padding-top:20px}.subt button{border:1px solid var(--line);background:var(--card);color:var(--mute);border-radius:99px;padding:0 18px;min-height:44px;font:inherit;font-size:14px;cursor:pointer}.subt button.on{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+.rhd{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}.rdt{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--mute)}.rdt select{min-width:240px}
+.big2{display:flex;gap:44px;flex-wrap:wrap;margin-top:6px}.big2>div{flex:0 1 auto;min-width:0}@media(max-width:760px){.big2{flex-wrap:nowrap}.big2>div{flex:1 1 0}.big2 .note{font-size:12.5px}}.big2 .big{font-size:56px}.hk .rlk{display:inline-block;margin-top:18px;color:#fff;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px;min-height:24px}
+.rli{display:flex;justify-content:space-between;gap:12px;padding:13px 4px;border-bottom:1px solid var(--line);cursor:pointer;font-size:15px}.rli:last-child{border:0}.rli:hover{background:var(--soft)}
+.rnote{display:flex;gap:10px;align-items:center;background:color-mix(in srgb,var(--blue) 12%,var(--card));border-radius:14px;padding:12px 16px;font-size:14px;margin:6px 0 22px}
+@media(max-width:760px){.big2{gap:24px}.big2 .big{font-size:42px}.rdt select{min-width:0;width:100%}.rdt{width:100%}}
 </style>
 </head>
 <body>
-<nav><div><b style="line-height:1.15;white-space:nowrap">🏘️ Divisi Penanganan Kumuh<br><span style="font-weight:400;font-size:10.5px;opacity:.65">Satgasus Pujaperi · Ditjen TKPR · KemenPKP</span></b><span class="tabs"><button class="tab on" data-p="dash">Dashboard Kawasan</button><button class="tab" data-p="rekap">Rekap Kawasan</button><button class="tab" data-p="balai">Dashboard Balai</button><button class="tab" data-p="rekapbalai">Rekap Balai</button></span><span class="sp"></span><a class="anc" href="#progres">Progres</a><a class="anc" href="#tren">Tren</a><a class="anc" href="#analisis">Analisis</a><a class="anc" href="#tabel">Kawasan</a><a class="anc" href="#pic">PIC</a></div></nav>
+<nav><div><b style="line-height:1.15;white-space:nowrap">🏘️ Divisi Penanganan Kumuh<br><span style="font-weight:400;font-size:10.5px;opacity:.65">Satgasus Pujaperi · Ditjen TKPR · KemenPKP</span></b><span class="tabs"><button class="tab on" data-p="ringkasan">Ringkasan</button><button class="tab" data-p="dash">Kawasan</button><button class="tab" data-p="balai">Balai</button></span><span class="sp"></span><a class="anc" href="#progres">Progres</a><a class="anc" href="#tren">Tren</a><a class="anc" href="#analisis">Analisis</a><a class="anc" href="#tabel">Kawasan</a><a class="anc" href="#pic">PIC</a></div></nav>
 <main>
+<div class="subt" id="subt" hidden></div>
 <div id="pgDash">
 <section class="hero" id="ringkasan">
 <small id="tgl"></small>
@@ -248,6 +255,10 @@ footer{padding:22px 16px;font-size:12px}
 <div class="pick"><button class="btn ghost" id="rkP">‹</button><select id="rkSel"></select><button class="btn ghost" id="rkN">›</button></div></section>
 <div id="rkBody"></div>
 </div>
+<div id="pgRingkas" hidden>
+<section class="hero"><div class="rhd"><div><small id="rTgl"></small><h1>Ringkasan Penanganan Kumuh</h1><p>Kondisi kawasan kumuh dan balai P3KP dalam satu halaman. Buka dashboard masing-masing untuk rincian.</p></div><label class="rdt">Tanggal laporan<select id="rDate"></select></label></div></section>
+<div class="rnote"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true" style="flex:none"><circle cx="9" cy="9" r="7"/><path d="M9 8v4M9 5.5v.1"/></svg><span><b>Integritas data.</b> Angka bersifat kumulatif. Kawasan atau balai yang belum melapor pada tanggal terpilih tidak dihitung sebagai nol.</span></div>
+<div id="rBody"></div></div>
 <div id="pgBalai" hidden>
 <section class="hero"><small id="bTgl"></small><h1>Monitoring Penanganan Kumuh BP3KP</h1><p id="bIntro"></p></section>
 <div id="bKpi"></div>
@@ -580,14 +591,45 @@ function drawMapB(){
  el.querySelectorAll('.pb').forEach(p=>p.onclick=()=>info(+p.dataset.i));
  if(mSelB!=null)info(mSelB);else $('#miB').innerHTML='<span class="note">Ketuk wilayah berwarna pada peta untuk melihat detail balai.</span>'}
 
+// ===== RINGKASAN (Kawasan + Balai) =====
+let rDt='';
+const wdays=(a,b)=>{let n=0;const d=new Date(a+'T00:00:00'),e=new Date(b+'T00:00:00');while(d<e){d.setDate(d.getDate()+1);const w=d.getDay();if(w&&w<6)n++}return n};
+const svi=d=>`<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const IC={pagu:svi('<circle cx="9" cy="9" r="6.5"/><path d="M9 5.5v7M6.8 7.4h3.4a1.2 1.2 0 010 2.4H7.8a1.2 1.2 0 000 2.4h3.4"/>'),ok:svi('<circle cx="9" cy="9" r="6.5"/><path d="M6 9.2l2.2 2.2L12.2 7"/>'),low:svi('<path d="M9 3.5v10M5 9.5l4 4 4-4"/>'),warn:svi('<path d="M9 3L16 15H2z"/><path d="M9 7.5v3M9 12.6v.1"/>')};
+function snap(dt){
+ const ks=K.map((k,i)=>{if(!dt)return{i,k,rep:1,fis:k.fis,ren:k.ren,dev:k.dev,real:k.real,hk:k.hk,bu:k.sts==='Belum update'||k.hk>7};
+  const h=k.h.filter(x=>x.d<=dt).pop();if(!h)return{i,k,rep:0};const hk=wdays(h.d,dt);return{i,k,rep:1,fis:h.fl,ren:h.rn,dev:h.fl-h.rn,real:h.c.reduce((a,b)=>a+b,0),hk,bu:hk>7}});
+ const bs=BL.map((b,i)=>{if(!dt)return{i,b,rep:1,real:b.real,hk:b.hk,sts:b.sts};const h=b.h.filter(x=>x.d<=dt).pop();if(!h)return{i,b,rep:0};const hk=wdays(h.d,dt);return{i,b,rep:1,real:h.r,hk,sts:b.pagu&&h.r/b.pagu>=1?'Progres selesai':hk>7?'Belum update':'Progres berjalan'}});
+ return{ks,bs}}
+(()=>{const ds=[...new Set([...K.flatMap(k=>k.h.map(x=>x.d)),...BL.flatMap(b=>b.h.map(x=>x.d))])].sort().reverse();
+ $('#rDate').innerHTML='<option value="">Terbaru (sesuai dashboard)</option>'+ds.map(d=>`<option value="${d}">${tgl(d)}</option>`).join('');
+ $('#rDate').onchange=e=>{rDt=e.target.value;renderRingkas()}})();
+function renderRingkas(){
+ const T=rDt||D.date,{ks,bs}=snap(rDt),rk=ks.filter(o=>o.rep),rb=bs.filter(o=>o.rep),avg=a=>a.length?sum(a)/a.length:0;
+ $('#rTgl').textContent='Data per '+new Date(T+'T00:00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ const fis=avg(rk.map(o=>o.fis)),kn=rk.filter(o=>o.ren>0),ren=avg(kn.map(o=>o.ren)),sr=sum(rk.map(o=>o.real)),sp=sum(rk.map(o=>o.k.pagu)),keu=sp?sr/sp:0,ses=kn.filter(o=>o.dev>=0).length,tg=kn.filter(o=>o.dev<0).length,lap=rk.filter(o=>!o.bu).length;
+ const bR=sum(rb.map(o=>o.real)),bP=sum(rb.map(o=>o.b.pagu)),bser=bP?bR/bP:0,bc=['ok','bl','er','wa'].map(c=>rb.filter(o=>bst({sts:o.sts})[0]===c).length),bbu=rb.filter(o=>bst({sts:o.sts})[0]==='wa').sort((a,b)=>b.hk-a.hk);
+ const low=[...rb].sort((a,b)=>a.real/a.b.pagu-b.real/b.b.pagu)[0],lowS=low?low.real/low.b.pagu:0,kbu=rk.filter(o=>o.bu).length,tgl4=kn.filter(o=>o.dev<0).sort((a,b)=>a.dev-b.dev).slice(0,4);
+ if(!rk.length&&!rb.length){$('#rBody').innerHTML='<div class="card"><p class="note">Belum ada laporan pada tanggal ini. Pilih tanggal yang lebih baru.</p></div>';return}
+ const lis=(a,f)=>a.length?a.map(f).join(''):'<p class="note" style="padding:10px 0">Tidak ada.</p>';
+ $('#rBody').innerHTML=`<div class="g2k"><div class="hk f"><div class="lbl">Kawasan Kumuh · ${rk.length} dari ${K.length} kawasan sudah melapor</div><div class="big2"><div><div class="big">${P(fis)}</div><div class="note">Realisasi fisik rata-rata<br>${kn.length?'rencana '+P(ren):'rencana belum diinput'}</div></div><div><div class="big">${P(keu)}</div><div class="note">Realisasi anggaran<br>${M(sr)} dari ${M(sp)}</div></div></div><div class="mini"><div><b>${ses}</b>sesuai rencana</div><div><b>${tg}</b>tertinggal</div><div><b>${lap}/${K.length}</b>update terbaru</div></div>${kn.length<rk.length?`<div class="note" style="margin-top:10px">${rk.length-kn.length} kawasan belum memiliki data rencana pada tanggal ini, jadi tidak masuk hitungan sesuai/tertinggal.</div>`:''}<a class="rlk" onclick="location.hash='#dash'">Buka dashboard kawasan →</a></div>
+ <div class="hk a"><div class="lbl">Balai P3KP · ${rb.length} dari ${BL.length} balai sudah melapor</div><div class="big2"><div><div class="big">${P(bser)}</div><div class="note">Serapan anggaran<br>${M(bR)} dari ${M(bP)}</div></div></div><div style="display:flex;height:12px;border-radius:9px;overflow:hidden;background:rgba(255,255,255,.25);margin-top:22px">${bc.map((v,i)=>v?`<i style="width:${v/rb.length*100}%;background:${['#fff','rgba(255,255,255,.62)','#ffb4b4','#ffe08a'][i]}"></i>`:'').join('')}</div><div class="mini"><div><b>${bc[0]}</b>selesai</div><div><b>${bc[1]}</b>berjalan</div><div><b>${bc[2]}</b>terhambat</div><div><b>${bc[3]}</b>belum update</div></div><a class="rlk" onclick="location.hash='#balai'">Buka dashboard balai →</a></div></div>
+ <div class="grid g4" style="margin-top:16px">${sm('c1',IC.pagu,'Total pagu kawasan',M(sp).replace('Rp ',''),'Tahun anggaran 2026')}${sm('c4',IC.ok,'Realisasi kawasan',M(sr).replace('Rp ',''),P(keu)+' dari pagu')}${sm('c2',IC.low,'Serapan balai terendah',P(lowS),low?esc(low.b.s):'–')}${sm('c3',IC.warn,'Perlu perhatian',String(tg+kbu+bbu.length),`${tg} tertinggal · ${kbu+bbu.length} belum update`)}</div>
+ <div class="grid g2" style="margin-top:16px"><div class="card"><h3>Kawasan tertinggal dari rencana</h3><p class="note">Deviasi fisik terhadap rencana · ketuk untuk membuka rekap</p>${lis(tgl4,o=>`<div class="rli" onclick="goRekap(${o.i})"><span>${esc(o.k.s)}</span><b style="color:var(--red)">${(o.dev*100).toFixed(1).replace('.',',')}%</b></div>`)}</div>
+ <div class="card"><h3>Balai belum update</h3><p class="note">Data terakhir lebih dari 7 hari kerja lalu</p>${lis(bbu.slice(0,4),o=>`<div class="rli" onclick="goRkB(${o.i})"><span>${esc(o.b.s)}</span><b style="color:var(--amber)">${o.hk} hari</b></div>`)}</div></div>
+ <div class="card" style="margin-top:16px"><h3>Tren mingguan kawasan</h3><p class="note">Rata-rata realisasi fisik dan keuangan per minggu</p><div class="chart"><canvas id="cRs"></canvas></div></div>`;
+ const wi=D.weeks.map((_,i)=>i).filter(i=>{const e=new Date(Date.UTC(2026,9,1+7*i));return new Date(+e-6*864e5).toISOString().slice(0,10)<=T}),line=clr('--line');
+ mk('cRs',{type:'line',data:{labels:wi.map(i=>D.weeks[i]),datasets:[lineSet('Fisik (%)',clr('--blue'),wi.map(i=>+(avg(K.map(k=>k.fh[i]||0))*100).toFixed(1))),lineSet('Keuangan (%)',clr('--amber'),wi.map(i=>+(avg(K.map(k=>k.kh[i]||0))*100).toFixed(1)))]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{x:{grid:{display:false},border:{display:false}},y:{grid:{color:line},border:{display:false},ticks:{callback:v=>v+'%'}}}}});
+}
+function SUB(p){const g={dash:['dash','rekap'],rekap:['dash','rekap'],balai:['balai','rekapbalai'],rekapbalai:['balai','rekapbalai']}[p],bx=$('#subt');if(!g){bx.hidden=true;return}const n=p==='dash'||p==='rekap'?['Dashboard Kawasan','Rekap Kawasan']:['Dashboard Balai','Rekap Balai'];bx.hidden=false;bx.innerHTML=g.map((h,i)=>`<button class="${h===p?'on':''}" onclick="location.hash='#${h}'">${n[i]}</button>`).join('')}
 // Routing
-const PG={dash:'pgDash',rekap:'pgRekap',balai:'pgBalai',rekapbalai:'pgRkBalai'};
+const PG={ringkasan:'pgRingkas',dash:'pgDash',rekap:'pgRekap',balai:'pgBalai',rekapbalai:'pgRkBalai'};
 function route(){
- const r=(location.hash||'#dash').slice(1),p=PG[r]?r:'dash';
+ const r=(location.hash||'#ringkasan').slice(1),p=PG[r]?r:'ringkasan';
  Object.entries(PG).forEach(([k,v])=>$('#'+v).hidden=k!==p);
- document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
+ document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.p===({rekap:'dash',rekapbalai:'balai'}[p]||p)));
  document.querySelectorAll('.anc').forEach(a=>a.style.display=p==='dash'?'':'none');
- if(p==='dash')drawMapK();if(p==='rekap')renderRekap(rkI);if(p==='balai'){renderBalai();drawMapB()}if(p==='rekapbalai')renderRkB(rbI);
+ SUB(p);if(p==='ringkasan')renderRingkas();if(p==='dash')drawMapK();if(p==='rekap')renderRekap(rkI);if(p==='balai'){renderBalai();drawMapB()}if(p==='rekapbalai')renderRkB(rbI);
  if(p!=='dash')scrollTo(0,0);
 }
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{location.hash='#'+b.dataset.p;});
@@ -738,27 +780,29 @@ pn.onclick=e=>{const c=e.target.closest('[data-q]');if(c){ask(c.dataset.q);retur
 window.qaAnswer=answer;
 })();
 
-// ===== TEMA: otomatis / terang / gelap =====
+// ===== TEMA (satu tombol: Otomatis / Terang / Gelap) =====
 (()=>{
-const root=document.documentElement,dq=matchMedia('(prefers-color-scheme:dark)');
+const root=document.documentElement,dq=matchMedia('(prefers-color-scheme:dark)'),ORD=['auto','light','dark'],NM={auto:'Otomatis',light:'Terang',dark:'Gelap'};
+const sv=d=>`<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const IC={auto:sv('<circle cx="9" cy="9" r="6"/><path d="M9 3a6 6 0 010 12z" fill="currentColor"/>'),light:sv('<circle cx="9" cy="9" r="3.2"/><path d="M9 1.8v1.9M9 14.3v1.9M1.8 9h1.9M14.3 9h1.9M3.9 3.9l1.3 1.3M12.8 12.8l1.3 1.3M3.9 14.1l1.3-1.3M12.8 5.2l1.3-1.3"/>'),dark:sv('<path d="M14.8 10.6A6.3 6.3 0 017.4 3.2a6.3 6.3 0 107.4 7.4z"/>')};
 let mode='auto';try{mode=localStorage.getItem('theme')||'auto'}catch(e){}
-if(mode!=='light'&&mode!=='dark')mode='auto';
-const box=document.createElement('span');box.id='thm';box.setAttribute('role','group');box.setAttribute('aria-label','Tema tampilan');
-box.innerHTML=[['auto','🌓','Otomatis (ikut perangkat)'],['light','☀️','Terang'],['dark','🌙','Gelap']].map(x=>`<button data-m="${x[0]}" title="${x[2]}" aria-label="${x[2]}">${x[1]}</button>`).join('');
-{const nv=document.querySelector('nav > div');nv.insertBefore(box,nv.querySelector('.sp')||null)}
-const st=document.createElement('style');st.textContent=`#thm{display:inline-flex;gap:2px;background:var(--soft);padding:3px;border-radius:99px;margin-left:10px;flex:none}#thm button{border:0;background:none;border-radius:99px;width:32px;height:30px;font-size:15px;cursor:pointer;line-height:1;opacity:.55;padding:0}#thm button.on{background:var(--solid);opacity:1;box-shadow:0 1px 3px rgba(0,0,0,.18)}@media(max-width:760px){#thm{margin-left:auto}#thm button{width:36px;height:34px}}`;
+if(!NM[mode])mode='auto';
+const btn=document.createElement('button');btn.id='thm';btn.type='button';
+{const nv=document.querySelector('nav > div');nv.insertBefore(btn,nv.querySelector('.sp')||null)}
+const st=document.createElement('style');st.textContent='#thm{display:inline-flex;align-items:center;gap:8px;margin-left:10px;flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;min-height:44px;padding:0 16px 0 14px;font:inherit;font-size:13.5px;font-weight:500;cursor:pointer}#thm:hover{background:var(--soft)}@media(max-width:760px){#thm{margin-left:auto;width:44px;padding:0;justify-content:center}#thm span{display:none}}';
 document.head.appendChild(st);
-function redraw(){try{draw();if(!$('#pgRekap').hidden)renderRekap(rkI);if(!$('#pgBalai').hidden)bcharts();if(!$('#pgRkBalai').hidden)renderRkB(rbI)}catch(e){console.error(e)}}
+function redraw(){try{draw();if(!$("#pgRingkas").hidden)renderRingkas();if(!$('#pgRekap').hidden)renderRekap(rkI);if(!$('#pgBalai').hidden)bcharts();if(!$('#pgRkBalai').hidden)renderRkB(rbI)}catch(e){console.error(e)}}
 function apply(m,save,re){mode=m;m==='auto'?root.removeAttribute('data-theme'):root.setAttribute('data-theme',m);
  if(save)try{m==='auto'?localStorage.removeItem('theme'):localStorage.setItem('theme',m)}catch(e){}
  const dark=m==='dark'||(m==='auto'&&dq.matches);document.querySelectorAll('meta[name=theme-color]').forEach(x=>x.remove());
  const t=document.createElement('meta');t.name='theme-color';t.content=dark?'#0c0e14':'#f5f6fa';document.head.appendChild(t);
- box.querySelectorAll('button').forEach(b=>{const on=b.dataset.m===m;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});
+ btn.innerHTML=IC[m]+'<span>'+NM[m]+'</span>';btn.title='Tema: '+NM[m]+' (klik untuk mengganti)';btn.setAttribute('aria-label','Tema: '+NM[m]+'. Klik untuk mengganti');
  if(re)setTimeout(redraw,30)}
-box.onclick=e=>{const b=e.target.closest('button');if(b)apply(b.dataset.m,true,true)};
-dq.addEventListener('change',()=>{if(mode==='auto')apply('auto',false,false)});
+btn.onclick=()=>apply(ORD[(ORD.indexOf(mode)+1)%3],true,true);
+dq.addEventListener('change',()=>{if(mode==='auto')apply('auto',false,true)});
 apply(mode,false,mode!=='auto');
 })();
+
 </script>
 </body>
 </html>
